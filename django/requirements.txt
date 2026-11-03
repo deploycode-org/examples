@@ -1,0 +1,8 @@
+asgiref==3.13.0
+    # via django
+django==5.2.19
+    # via -r django.in
+gunicorn==26.2.0
+    # via -r django.in
+sqlparse==0.6.1
+    # via django

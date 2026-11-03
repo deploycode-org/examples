@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# virtual environment
+/.venv/
+
+# local database created by `manage.py migrate`
+/db.sqlite3
+
+# collected static files
+/staticfiles/
