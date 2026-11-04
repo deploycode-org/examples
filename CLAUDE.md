@@ -9,7 +9,7 @@ A collection of deployable sample applications (`deploycode-org/examples`), one 
 Examples:
 
 - `vite/` — React 19 + TypeScript + Vite 8. Static SPA, builds to `dist/`.
-- `nextjs/` — Next.js 16 App Router + React 19 + TypeScript, no Tailwind. Server app, builds to `.next/`.
+- `nextjs/` — Next.js 16 App Router + React 19 + TypeScript, no Tailwind. Server app, builds to `.next/`. Each page checks one feature that depends on how the app is hosted: `app/api/hello` (Route Handler, GET and POST), `app/actions` (Server Action through `useActionState`), `proxy.ts` (Next.js 16's name for middleware: `/old-proxy` redirects to `/proxy`, which reads back the request header the proxy adds), `app/isr` (`revalidate = 30`, dropped at once by `POST /api/revalidate`), `app/image` (a 1600 px JPEG through `/_next/image`, which needs sharp at runtime), `app/streaming` (a Suspense part three seconds after the shell) and `app/env` (`NEXT_PUBLIC_BUILD_MESSAGE` inlined at build, `RUNTIME_MESSAGE` read per request). The pages print the container hostname: ISR copies and Server Action state are per container.
 - `django/` — Django 5.2 LTS served by gunicorn. One page and `/health`, no apps, SQLite. The settings package is `config/`.
 - `fastapi/` — FastAPI served by uvicorn. One page, `/health` and the generated `/docs`.
 - `fixed-port/` — a Node.js server on `node:http`, no dependencies, that **always listens on 8080 and ignores `PORT`**. It exists to check that the platform notices an app listening elsewhere than its domain routes to. `BIND_ADDRESS=127.0.0.1` in the service variables makes it listen on localhost only, the other case to notice. Do not "fix" it to read `PORT`.
@@ -58,7 +58,7 @@ There is no test suite and no linter configured in any example — `npm run buil
 - The Node examples pin `engines.node: "22"`; the Python examples pin `3.13` in `.python-version`, Railpack's default.
 - `requirements.txt` in the Python examples is the full pinned set (`uv pip compile --python-version 3.13`), not a list of top-level packages. Keep `gunicorn` (Django) and `uvicorn` (FastAPI) in it: Railpack picks its start command from them.
 - `vite/` TypeScript uses project references: `tsconfig.json` is a solution file that references `tsconfig.app.json` (covers `src/`) and `tsconfig.node.json` (covers `vite.config.ts` only). New config files at the example root need to be added to `tsconfig.node.json`'s `include` or they won't be type-checked.
-- `nextjs/`: `next build` type-checks on its own; there is no separate `tsc` step. `next-env.d.ts` and generated route types are gitignored and regenerated on build — don't commit or hand-edit them.
+- `nextjs/`: `next build` type-checks on its own; there is no separate `tsc` step. Middleware is `proxy.ts` exporting `proxy` in Next.js 16 — a `middleware.ts` is deprecated. `next/font/google` downloads Geist during the build, so the build needs network access. `next-env.d.ts` and generated route types are gitignored and regenerated on build — don't commit or hand-edit them.
 - `npm audit` in `nextjs/` reports high-severity advisories in `postcss` and `sharp`, both transitive deps of `next` itself. The only offered fix is downgrading to `next@9`; leave them alone.
 
 ## Adding a new example
